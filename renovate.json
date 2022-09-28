@@ -11,11 +11,5 @@
   "ignoreUnstable": true,
   "reviewersFromCodeOwners": true,
   "prCreation": "immediate",
-  "rebaseWhen": "conflicted",
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["minor", "pin", "digest"],
-      "automerge": false
-    }
-  ]
+  "rebaseWhen": "conflicted"
 }
