@@ -18,7 +18,7 @@
       "automerge": false
     },
     {
-      "matchManager": ["circleci"],
+      "matchManagers": ["circleci"],
       "matchUpdateTypes": ["patch"],
       "enabled": false
     }
