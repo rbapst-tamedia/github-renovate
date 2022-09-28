@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.2.0"
+  required_version = "~> 1.2"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -43,3 +43,11 @@ data "aws_eks_cluster_auth" "cluster" {
 data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
+
+data "terraform_remote_state" "infrastructure" {
+  backend = "s3"
+  config = {
+    bucket = "tf-state-${data.aws_caller_identity.current.account_id}"
+    key    = "infrastructure/terraform.tfstate"
+  }
+}
