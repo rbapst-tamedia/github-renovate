@@ -14,13 +14,8 @@
   "rebaseWhen": "conflicted",
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchUpdateTypes": ["minor", "pin", "digest"],
       "automerge": false
-    },
-    {
-      "matchManagers": ["circleci"],
-      "matchUpdateTypes": ["patch"],
-      "enabled": false
     }
   ]
 }
