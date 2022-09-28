@@ -16,6 +16,11 @@
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": false
+    },
+    {
+      "matchManager": ["circleci"],
+      "matchUpdateTypes": ["patch"],
+      "enabled": false
     }
   ]
 }
