@@ -1,0 +1,216 @@
+# --------
+# defaults
+# --------
+
+# those branches get deployed on the AWS production cluster
+prod-branch-filter: &prod-branch-filter
+  only:
+    - master
+
+# those branches get deployed on the AWS dev cluster
+dev-branch-filter: &dev-branch-filter
+  only:
+    - /^(?i)disc-.*/
+    - master
+
+# CCI docker-image to use (should reflect the node version in Dockerfile)
+cci-docker-image: &cci-docker-image
+  image: cimg/node:16.17.0
+
+# where terraform files are
+default-tf-folder: &default-tf-folder
+  folder: deploy/terraform
+# default values for the tf/deploy job
+default-tf-deploy: &default-tf-deploy
+  tf_apply_cli_args: -auto-approve -var branch=${CIRCLE_BRANCH} -var image_tag=${CIRCLE_SHA1} -var image_repo_prefix=${AWS_ECR_ACCOUNT_URL}/${CIRCLE_PROJECT_REPONAME} -var circle_sha1=${CIRCLE_SHA1} -var-file=app.tfvars
+  workspace: ${CIRCLE_BRANCH}
+
+# default values for the aws-ecr/build-and-push-image job
+default-aws-ecr: &default-aws-ecr
+  attach-workspace: true
+  create-repo: true
+  docker-login: true
+  dockerfile: Dockerfile.prod
+  executor: docker_build
+  path: .
+  region: $AWS_DEFAULT_REGION
+  registry-id: AWS_ACCOUNT_ID
+  repo: ${CIRCLE_PROJECT_REPONAME}/disco-frontend
+  tag: ${CIRCLE_SHA1},latest
+
+# -----------------------
+# actual circle ci config
+# -----------------------
+version: 2.1
+docker-auth: &docker-auth
+  auth:
+    username: $DOCKERHUB_USERNAME
+    password: $DOCKERHUB_PASSWORD
+
+orbs:
+  aws-ecr: circleci/aws-ecr@8.1
+  tf: dnd-it/terraform@2.2.1
+  aws-s3: circleci/aws-s3@3.0.0
+
+executors:
+  docker_build:
+    machine:
+      image: ubuntu-2004:202107-02
+      docker_layer_caching: true
+
+jobs:
+  tests:
+    docker:
+      - <<: *docker-auth
+        image: cimg/node:16.10.0 # jest leakes memory on node 16.13, see https://github.com/facebook/jest/issues/11956
+    resource_class: large
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            set -x
+            rm -rf ./node_modules && npm ci
+      - run:
+          name: lint
+          command: npm run lint
+      - run:
+          name: tests
+          command: node --expose-gc ./node_modules/jest/bin/jest.js
+      - run:
+          name: npm audit
+          command: if [ "${CIRCLE_BRANCH}" != "master" ]; then npm audit --production --audit-level=critical; else echo "Skipping npm audit"; fi
+
+  build-to-s3:
+    docker:
+      - <<: *cci-docker-image
+        <<: *docker-auth
+    parameters:
+      bucket:
+        description: "Bucket name"
+        type: string
+      date:
+        description: "today's date"
+        type: string
+    steps:
+      - checkout
+      # - setup_remote_docker:
+      #     docker_layer_caching: true
+      - run:
+          name: ENV
+          command: env
+      - run:
+          name: next.js build
+          command: |
+            set -x
+            rm -rf ./node_modules && npm ci && npm run build
+      - persist_to_workspace:
+          root: ~/project
+          paths: .
+      - aws-s3/copy:
+          from: ~/project/.next/BUILD_ID
+          to: s3://<< parameters.bucket >>/manifests/${CIRCLE_BRANCH}/<< parameters.date >>-BUILD_ID
+          aws-region: AWS_DEFAULT_REGION
+      - aws-s3/copy:
+          from: ~/project/.next/build-manifest.json
+          to: s3://<< parameters.bucket >>/manifests/${CIRCLE_BRANCH}/<< parameters.date >>-build-manifest.json
+          aws-region: AWS_DEFAULT_REGION
+      - aws-s3/copy:
+          arguments: |
+            --recursive \
+            --cache-control public,max-age=31536000 \
+            --metadata-directive REPLACE
+          from: ~/project/.next/static
+          to: s3://<< parameters.bucket >>/_next/static/
+          aws-region: AWS_DEFAULT_REGION
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - tests:
+          name: tests
+          context:
+            - "DockerHubCreds"
+          filters:
+            branches:
+              <<: *dev-branch-filter
+      - tf/fmt:
+          name: terraform-fmt
+          <<: *default-tf-folder
+      - build-to-s3:
+          name: build-nextjs-prod
+          context:
+            - "Disco Prod Frontend"
+            - "DockerHubCreds"
+          bucket: ${AWS_ACCOUNT_ID}-disco-web-assets
+          date: $(date +"%Y-%m-%d_%H-%M-%S")
+          filters:
+            branches:
+              <<: *prod-branch-filter
+          requires:
+            - tests
+
+      - aws-ecr/build-and-push-image:
+          <<: *default-aws-ecr
+          name: build-image-prod
+          context:
+            - "Disco Prod Frontend"
+            - "DockerHubCreds"
+          filters:
+            branches:
+              <<: *prod-branch-filter
+          requires:
+            - build-nextjs-prod
+
+      - tf/deploy:
+          <<: *default-tf-folder
+          <<: *default-tf-deploy
+          name: deploy-prod
+          context:
+            - "Disco Prod Frontend"
+            - "DockerHubCreds"
+          requires:
+            - terraform-fmt
+            - build-image-prod
+          filters:
+            branches:
+              <<: *prod-branch-filter
+
+      - build-to-s3:
+          name: build-nextjs-dev
+          context:
+            - "Disco Dev Frontend"
+            - "DockerHubCreds"
+          bucket: ${AWS_ACCOUNT_ID}-disco-web-assets
+          date: $(date +"%Y-%m-%d_%H-%M-%S")
+          filters:
+            branches:
+              <<: *dev-branch-filter
+          requires:
+            - tests
+
+      - aws-ecr/build-and-push-image:
+          <<: *default-aws-ecr
+          name: build-image-dev
+          context:
+            - "Disco Dev Frontend"
+            - "DockerHubCreds"
+          filters:
+            branches:
+              <<: *dev-branch-filter
+          requires:
+            - build-nextjs-dev
+
+      - tf/deploy:
+          <<: *default-tf-folder
+          <<: *default-tf-deploy
+          name: deploy-dev
+          context:
+            - "Disco Dev Frontend"
+            - "DockerHubCreds"
+          requires:
+            - terraform-fmt
+            - build-image-dev
+          filters:
+            branches:
+              <<: *dev-branch-filter
