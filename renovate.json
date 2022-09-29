@@ -18,7 +18,7 @@
   "packageRules": [
     {
       "matchPackageNames": ["circleci"],
-      "matchDepType": ["docker"],
+      "matchDepTypes": ["docker"],
       "allowedVersions": "<=18.0"
     },
     {
