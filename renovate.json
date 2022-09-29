@@ -16,9 +16,7 @@
     {
       "matchPackageNames": ["cimg/node"],
       "allowedVersions": "<=18.0"
-    }
-  ],
-  "packageRules": [
+    },
     {
       "matchUpdateTypes": ["minor", "pin", "digest"],
       "automerge": false
