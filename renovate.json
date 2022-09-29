@@ -17,11 +17,6 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["circleci"],
-      "matchDepTypes": ["docker"],
-      "allowedVersions": "<=18.0"
-    },
-    {
       "matchUpdateTypes": ["minor", "pin", "digest"],
       "automerge": false
     }
