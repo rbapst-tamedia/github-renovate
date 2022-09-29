@@ -11,5 +11,14 @@
   "ignoreUnstable": true,
   "reviewersFromCodeOwners": true,
   "prCreation": "immediate",
-  "rebaseWhen": "conflicted"
+  "rebaseWhen": "conflicted",
+  "ignoreDeps": [
+    "cimg-node-18x"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "pin", "digest"],
+      "automerge": false
+    }
+  ]
 }
