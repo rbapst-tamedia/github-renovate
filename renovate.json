@@ -12,9 +12,13 @@
   "reviewersFromCodeOwners": true,
   "prCreation": "immediate",
   "rebaseWhen": "conflicted",
+  "ignoreDeps": [
+    "cimg/node"
+  ],
   "packageRules": [
     {
-      "matchPackageNames": ["cimg/node"],
+      "matchPackageNames": ["circleci"],
+      "matchDepType": ["docker"],
       "allowedVersions": "<=18.0"
     },
     {
