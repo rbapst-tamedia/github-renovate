@@ -12,8 +12,11 @@
   "reviewersFromCodeOwners": true,
   "prCreation": "immediate",
   "rebaseWhen": "conflicted",
-  "ignoreDeps": [
-    "cimg-node-18x"
+  "packageRules" [
+    {
+      "matchPackageNames": ["cimg/node"],
+      "allowedVersions": "<=18.0"
+    }
   ],
   "packageRules": [
     {
