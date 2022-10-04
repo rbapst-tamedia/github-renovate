@@ -1,4 +1,4 @@
-FROM node:16.17.0-alpine
+FROM node:18.10.0-alpine
 
 # needed in npm run test
 RUN apk add curl
