@@ -2,7 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:base", "schedule:nonOfficeHours", ":preserveSemverRanges"],
   "reviewers": ["team:DAI-Team"],
-  "enabledManagers": ["dockerfile", "terraform", "github-actions", "circleci"],
+  "enabledManagers": ["terraform", "github-actions", "circleci"],
   "updateNotScheduled": false,
   "commitBodyTable": true,
   "assigneesFromCodeOwners": true,
@@ -12,9 +12,6 @@
   "reviewersFromCodeOwners": true,
   "prCreation": "immediate",
   "rebaseWhen": "conflicted",
-  "ignoreDeps": [
-    "cimg/node"
-  ],
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "pin", "digest"],
