@@ -15,7 +15,7 @@ dev-branch-filter: &dev-branch-filter
 
 # CCI docker-image to use (should reflect the node version in Dockerfile)
 cci-docker-image: &cci-docker-image
-  image: cimg/node:16.17.0
+  image: cimg/node:19.9.0
 
 # where terraform files are
 default-tf-folder: &default-tf-folder
