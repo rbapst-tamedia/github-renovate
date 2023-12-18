@@ -19,7 +19,7 @@
     },
     {
       "matchUpdateTypes": ["minor", "patch"],
-      "minimumReleaseAge": "10 days"
+      "minimumReleaseAge": "1 days"
     }
   ]
 }
