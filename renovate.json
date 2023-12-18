@@ -10,7 +10,12 @@
   "ignoreDeprecated": true,
   "ignoreUnstable": true,
   "reviewersFromCodeOwners": true,
-  "prCreation": "not-pending",
   "rebaseWhen": "conflicted",
-  "minimumReleaseAge": "100 day"
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "minimumReleaseAge": "10 days",
+      "prCreation": "not-pending"
+    }
+  ]
 }
