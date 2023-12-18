@@ -13,6 +13,4 @@
   "prCreation": "not-pending",
   "rebaseWhen": "conflicted",
   "minimumReleaseAge": "100 day"
-    }
-  ]
 }
