@@ -14,8 +14,8 @@
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
-      "minimumReleaseAge": "10 days",
       "prCreation": "not-pending"
+      "minimumReleaseAge": "3 days",
     }
   ]
 }
