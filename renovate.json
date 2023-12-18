@@ -10,7 +10,7 @@
   "ignoreDeprecated": true,
   "ignoreUnstable": true,
   "reviewersFromCodeOwners": true,
-  "prCreation": "immediate",
+  "prCreation": "not-pending",
   "rebaseWhen": "conflicted",
   "packageRules": [
     {
