@@ -1,4 +1,4 @@
-"a": {
+{
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:base", "schedule:nonOfficeHours", ":preserveSemverRanges"],
   "reviewers": ["team:DAI-Team"],
@@ -19,7 +19,7 @@
     },
     {
       "matchUpdateTypes": ["minor", "patch"],
-      "minimumReleaseAge": 10
+      "minimumReleaseAge": "10 days"
     }
   ]
 }
