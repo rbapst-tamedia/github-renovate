@@ -12,14 +12,7 @@
   "reviewersFromCodeOwners": true,
   "prCreation": "not-pending",
   "rebaseWhen": "conflicted",
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["minor", "pin", "digest"],
-      "automerge": false
-    },
-    {
-      "matchUpdateTypes": ["minor", "patch"],
-      "minimumReleaseAge": "1 days"
+  "minimumReleaseAge": "100 day"
     }
   ]
 }
