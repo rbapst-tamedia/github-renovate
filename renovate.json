@@ -1,4 +1,4 @@
-{
+"a": {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:base", "schedule:nonOfficeHours", ":preserveSemverRanges"],
   "reviewers": ["team:DAI-Team"],
@@ -16,6 +16,10 @@
     {
       "matchUpdateTypes": ["minor", "pin", "digest"],
       "automerge": false
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "minimumReleaseAge": 10
     }
   ]
 }
