@@ -15,7 +15,7 @@
     {
       "matchUpdateTypes": ["minor", "patch"],
       "prCreation": "not-pending",
-      "minimumReleaseAge": "2 days"
+      "minimumReleaseAge": "90 days"
     }
   ]
 }
